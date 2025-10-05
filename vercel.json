@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "functions": {
+    "api/quote.js": {
+      "memory": 128
+    },
+    "api/vapid-public-key.js": {
+      "memory": 128
+    },
+    "api/subscribe.js": {
+      "memory": 128
+    },
+    "api/send-notification.js": {
+      "memory": 128
+    },
+    "api/cron-notify.js": {
+      "memory": 128
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron-notify",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

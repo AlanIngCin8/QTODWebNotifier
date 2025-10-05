@@ -1,7 +1,11 @@
-const express = require('express');
-const webpush = require('web-push');
-const cors = require('cors');
-const path = require('path');
+import express from 'express';
+import webpush from 'web-push';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3000;

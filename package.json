@@ -2,11 +2,14 @@
   "name": "qtodwebnotifier",
   "version": "1.0.0",
   "description": "Quote of the day- Web app to demo push notifications",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vercel-dev": "vercel dev",
+    "deploy": "vercel --prod"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +18,8 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "vercel": "^37.0.0"
   }
 }

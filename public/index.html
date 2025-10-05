@@ -166,7 +166,7 @@
     <div class="container">
         <h1>📱 Quote of the Day</h1>
         <p>Get inspired with famous quotes delivered right to your device!</p>
-        <p><small><em>🌐 This is a static demo version hosted on GitHub Pages. For full push notification features, run the server version locally.</em></small></p>
+        <p><small><em id="deploymentInfo">🌐 Detecting deployment environment...</em></small></p>
         
         <div class="quote-container">
             <div class="quote-text" id="quoteText">Loading quote...</div>
@@ -197,10 +197,21 @@
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            getNewQuote();
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            // Detect if we're running on a server with API endpoints
+            const hasServerAPI = await checkServerAPI();
             
-            // For static GitHub Pages version, show info about limitations
-            showStatus('This is a static demo version. Push notifications require the full server version.', 'info');
+            if (hasServerAPI) {
+                document.getElementById('deploymentInfo').innerHTML = '🚀 Full serverless version with push notifications enabled!';
+                await registerServiceWorker();
+                await getNewQuoteFromAPI();
+            } else {
+                document.getElementById('deploymentInfo').innerHTML = '🌐 Static demo version. For full push notification features, deploy to Vercel or run server locally.';
+                getNewQuoteStatic();
+            }
             
             // Show install prompt for PWA
             if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -209,18 +220,154 @@
             } else {
                 document.getElementById('installPrompt').style.display = 'block';
             }
-        });
+        }
+
+        async function checkServerAPI() {
+            try {
+                const response = await fetch('/api/quote');
+                return response.ok;
+            } catch (error) {
+                console.log('API not available, using static mode');
+                return false;
+            }
+        }
+
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    swRegistration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker registered successfully');
+                    
+                    // Check if already subscribed
+                    const subscription = await swRegistration.pushManager.getSubscription();
+                    isSubscribed = !(subscription === null);
+                    updateSubscribeButton(isSubscribed);
+                } catch (error) {
+                    console.error('Service Worker registration failed:', error);
+                }
+            }
+        }
 
 
         async function subscribeToNotifications() {
-            showStatus('Push notifications are not available in the static GitHub Pages version. For full functionality, please run the server version locally.', 'info');
+            // Check if we have server API
+            const hasServerAPI = await checkServerAPI();
+            if (!hasServerAPI) {
+                showStatus('Push notifications are not available in the static version. Deploy to Vercel for full functionality.', 'info');
+                return;
+            }
+
+            if (!swRegistration) {
+                showStatus('Service Worker not registered. Please refresh the page.', 'error');
+                return;
+            }
+
+            if (isSubscribed) {
+                // Unsubscribe
+                try {
+                    const subscription = await swRegistration.pushManager.getSubscription();
+                    if (subscription) {
+                        await subscription.unsubscribe();
+                        isSubscribed = false;
+                        updateSubscribeButton(false);
+                        showStatus('Unsubscribed from push notifications', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error unsubscribing:', error);
+                    showStatus('Error unsubscribing from notifications', 'error');
+                }
+            } else {
+                // Subscribe
+                try {
+                    const applicationServerKey = await getVapidPublicKey();
+                    if (!applicationServerKey) {
+                        showStatus('Failed to get VAPID key', 'error');
+                        return;
+                    }
+
+                    const subscription = await swRegistration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(applicationServerKey)
+                    });
+
+                    console.log('Subscription:', subscription);
+
+                    const response = await fetch('/api/subscribe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(subscription)
+                    });
+
+                    if (response.ok) {
+                        isSubscribed = true;
+                        updateSubscribeButton(true);
+                        showStatus('Successfully subscribed to push notifications!', 'success');
+                    } else {
+                        throw new Error('Failed to subscribe on server');
+                    }
+                } catch (error) {
+                    console.error('Error subscribing:', error);
+                    showStatus('Failed to subscribe to notifications', 'error');
+                }
+            }
+        }
+
+        async function getVapidPublicKey() {
+            try {
+                const response = await fetch('/api/vapid-public-key');
+                const data = await response.json();
+                return data.publicKey;
+            } catch (error) {
+                console.error('Error getting VAPID key:', error);
+                return null;
+            }
         }
 
         async function sendTestNotification() {
-            showStatus('Test notifications are not available in the static GitHub Pages version. For full functionality, please run the server version locally.', 'info');
+            // Check if we have server API
+            const hasServerAPI = await checkServerAPI();
+            if (!hasServerAPI) {
+                showStatus('Test notifications are not available in the static version. Deploy to Vercel for full functionality.', 'info');
+                return;
+            }
+
+            if (!isSubscribed) {
+                showStatus('Please subscribe to notifications first', 'info');
+                return;
+            }
+
+            try {
+                const subscription = await swRegistration.pushManager.getSubscription();
+                if (!subscription) {
+                    showStatus('No subscription found', 'error');
+                    return;
+                }
+
+                const response = await fetch('/api/send-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subscriptions: [subscription]
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    showStatus('Test notification sent!', 'success');
+                } else {
+                    showStatus(`Failed to send notification: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error sending test notification:', error);
+                showStatus('Failed to send test notification', 'error');
+            }
         }
 
-        // Static quotes for GitHub Pages deployment
+        // Static quotes for fallback when API is not available
         const quotes = [
             { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
             { text: "Life is what happens to you while you're busy making other plans.", author: "John Lennon" },
@@ -239,7 +386,24 @@
             { text: "The only thing we have to fear is fear itself.", author: "Franklin D. Roosevelt" }
         ];
 
-        function getNewQuote() {
+        async function getNewQuoteFromAPI() {
+            try {
+                const response = await fetch('/api/quote');
+                if (response.ok) {
+                    const quote = await response.json();
+                    document.getElementById('quoteText').textContent = `"${quote.text}"`;
+                    document.getElementById('quoteAuthor').textContent = `— ${quote.author}`;
+                } else {
+                    throw new Error('API request failed');
+                }
+            } catch (error) {
+                console.error('Error getting quote from API:', error);
+                // Fallback to static quotes
+                getNewQuoteStatic();
+            }
+        }
+
+        function getNewQuoteStatic() {
             try {
                 const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
                 
@@ -249,6 +413,15 @@
                 console.error('Error getting quote:', error);
                 document.getElementById('quoteText').textContent = 'Failed to load quote';
                 document.getElementById('quoteAuthor').textContent = '';
+            }
+        }
+
+        async function getNewQuote() {
+            const hasServerAPI = await checkServerAPI();
+            if (hasServerAPI) {
+                await getNewQuoteFromAPI();
+            } else {
+                getNewQuoteStatic();
             }
         }
 
