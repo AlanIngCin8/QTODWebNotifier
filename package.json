@@ -2,6 +2,7 @@
   "name": "qtodwebnotifier",
   "version": "1.0.0",
   "description": "Quote of the day- Web app to demo push notifications",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",

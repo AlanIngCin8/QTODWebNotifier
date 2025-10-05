@@ -32,6 +32,15 @@
     },
     "api/send-notification.js": {
       "memory": 128
+    },
+    "api/cron-notify.js": {
+      "memory": 128
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron-notify",
+      "schedule": "0 * * * *"
+    }
+  ]
 }

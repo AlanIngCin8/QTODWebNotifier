@@ -94,20 +94,23 @@ The application is converted to serverless functions:
 To add hourly notifications, you can:
 
 1. **Use Vercel Cron Jobs** (Recommended):
-   Create `/api/cron-notify.js`:
-   ```javascript
-   // This endpoint can be called by Vercel Cron Jobs
-   export default async function handler(req, res) {
-     // Verify the request is from Vercel Cron
-     if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
-       return res.status(401).json({ error: 'Unauthorized' });
-     }
-     
-     // Get all subscriptions from database
-     // Send notifications to all subscribers
-     // Return success response
+   The repository includes an example cron endpoint at `/api/cron-notify.js` that demonstrates scheduled notifications. The `vercel.json` file is already configured to run this hourly:
+
+   ```json
+   {
+     "crons": [
+       {
+         "path": "/api/cron-notify",
+         "schedule": "0 * * * *"
+       }
+     ]
    }
    ```
+
+   To enable this in production:
+   - Uncomment the cron configuration in `vercel.json`
+   - Implement database storage for subscriptions in the cron endpoint
+   - Add `CRON_SECRET` environment variable for security
 
 2. **Use GitHub Actions**:
    Create a GitHub Action that calls your `/api/send-notification` endpoint hourly.
