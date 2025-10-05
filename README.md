@@ -124,13 +124,32 @@ A Progressive Web App (PWA) that delivers inspiring quotes from famous people as
 
 ## Deployment
 
-### GitHub Pages (Automatic)
+### Vercel Serverless (Recommended for Full Features)
+Deploy as serverless functions with full push notification support:
+
+1. **Quick Deploy**: 
+   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAlanIngCin8%2FQTODWebNotifier)
+
+2. **Manual Setup**:
+   - Connect your GitHub repository to Vercel
+   - Set environment variables: `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY`
+   - Deploy automatically on push
+
+3. **Features**: ✅ Full push notifications, ✅ PWA installation, ✅ Serverless scaling
+4. **See detailed guide**: [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
+
+### GitHub Pages (Static Demo)
 This repository includes GitHub Actions workflow for automatic deployment to GitHub Pages:
 
 - **Workflow**: `.github/workflows/deploy.yml`
 - **Triggers**: Push to main branch, Pull Requests, Manual trigger
 - **Deploy URL**: `https://[username].github.io/QTODWebNotifier`
-- **Features**: Static demo version with quote browsing and PWA installation
+- **Features**: Static demo version with quote browsing and PWA installation (no push notifications)
+
+### Other Platforms
+- **Netlify**: Connect your GitHub repo for automatic deployment
+- **Railway**: `railway up` from project directory
+- **Heroku**: `git push heroku main` with environment variables set
 
 ## Environment Variables
 
