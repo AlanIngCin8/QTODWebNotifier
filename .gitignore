@@ -95,3 +95,7 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+# GitHub Actions
+_site/
+.github/actions-cache/
