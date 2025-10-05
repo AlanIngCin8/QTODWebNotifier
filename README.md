@@ -48,7 +48,16 @@ A Progressive Web App (PWA) that delivers inspiring quotes from famous people as
 6. Select "Add to Home Screen"
 7. Tap "Add" to install the app
 
-### Option 2: Deploy to a Server (recommended for real testing)
+### Option 2: GitHub Pages (Static Demo Version)
+1. **Live Demo**: Visit the GitHub Pages deployment at `https://[username].github.io/QTODWebNotifier`
+2. **Features Available**:
+   - ✅ Quote browsing with "Get New Quote" button
+   - ✅ PWA installation (Add to Home Screen)
+   - ✅ Responsive design and mobile optimization
+   - ❌ Push notifications (requires server backend)
+3. **Perfect for**: Testing PWA installation and quote browsing functionality
+
+### Option 3: Deploy to a Server (recommended for full testing)
 1. Deploy to platforms like:
    - **Heroku**: `git push heroku main`
    - **Vercel**: `vercel --prod`
@@ -113,9 +122,20 @@ A Progressive Web App (PWA) that delivers inspiring quotes from famous people as
 - **Debug Mode**: Check browser console for detailed error messages
 - **Service Worker**: Clear service worker cache during development
 
+## Deployment
+
+### GitHub Pages (Automatic)
+This repository includes GitHub Actions workflow for automatic deployment to GitHub Pages:
+
+- **Workflow**: `.github/workflows/deploy.yml`
+- **Triggers**: Push to main branch, Pull Requests, Manual trigger
+- **Deploy URL**: `https://[username].github.io/QTODWebNotifier`
+- **Features**: Static demo version with quote browsing and PWA installation
+
 ## Environment Variables
 
-For production deployment, set these environment variables:
+For production deployment of the full server version, set these environment variables:
+
 
 ```bash
 VAPID_PUBLIC_KEY=your_public_key_here
