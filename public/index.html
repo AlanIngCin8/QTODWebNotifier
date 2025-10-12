@@ -309,7 +309,20 @@
                     }
                 } catch (error) {
                     console.error('Error subscribing:', error);
-                    showStatus('Failed to subscribe to notifications', 'error');
+                    
+                    // Check if user is on iOS and provide specific guidance
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+                    
+                    if (isIOS && !isStandalone) {
+                        showStatus('On iOS, you must first install this app to your home screen before notifications will work. Tap the Share button (📤) and select "Add to Home Screen", then try enabling notifications again.', 'error');
+                    } else if (error.name === 'NotAllowedError') {
+                        showStatus('Notifications permission denied. Please check your browser settings and try again.', 'error');
+                    } else if (error.name === 'NotSupportedError') {
+                        showStatus('Push notifications are not supported in this browser.', 'error');
+                    } else {
+                        showStatus('Failed to subscribe to notifications. Make sure notifications are allowed in your browser settings.', 'error');
+                    }
                 }
             }
         }
@@ -444,9 +457,11 @@
             status.className = `status ${type}`;
             status.style.display = 'block';
             
+            // Longer timeout for longer messages (like iOS instructions)
+            const timeout = message.length > 100 ? 10000 : 5000;
             setTimeout(() => {
                 status.style.display = 'none';
-            }, 5000);
+            }, timeout);
         }
 
         function urlBase64ToUint8Array(base64String) {

@@ -166,10 +166,22 @@ When you open the Quote of the Day app, you'll see:
 
 #### **Getting Started with Notifications**
 1. **Open the app** in your browser or as an installed PWA
-2. **Click "Enable Notifications"** - this is the blue button in the app
-3. **Allow permission** when your browser asks "Allow notifications from this site?"
-4. **Test it works** by clicking "Send Test Notification" (purple button)
-5. **Enjoy daily quotes** delivered automatically to your device!
+2. **📱 IMPORTANT FOR iOS USERS**: You MUST install this app to your home screen BEFORE notifications will work. Tap the Share button (📤) in Safari and select "Add to Home Screen"
+3. **Click "Enable Notifications"** - this is the blue button in the app
+4. **Allow permission** when your browser asks "Allow notifications from this site?"
+5. **Test it works** by clicking "Send Test Notification" (purple button)
+6. **Enjoy daily quotes** delivered automatically to your device!
+
+#### **📱 iOS-Specific Requirements**
+- **iOS 16.4+ Required**: Push notifications only work on iOS 16.4 and later
+- **Must Install as PWA**: Unlike other platforms, iOS requires the app to be installed to the home screen before push notifications will function
+- **Safari Only**: Installation must be done through Safari browser
+- **Installation Steps**: 
+  1. Open the app in Safari
+  2. Tap the Share button (📤) at the bottom of the screen
+  3. Scroll down and tap "Add to Home Screen"
+  4. Tap "Add" to confirm
+  5. Now open the app from your home screen and enable notifications
 
 #### **What to Expect**
 - **Instant Test**: Test notifications appear immediately when you click the test button
@@ -237,17 +249,25 @@ When you open the Quote of the Day app, you'll see:
 ### Push Notifications Issues
 
 #### "Enable Notifications" Button Not Working?
-1. **Check Permission**: Look for notification permission prompt in browser
-2. **Browser Support**: Requires Safari 16.4+ on iOS, Chrome 50+ on Android
-3. **HTTPS Required**: Production deployments must use HTTPS
-4. **Try Again**: Clear browser data and refresh the page
-5. **Server Mode**: Ensure you're using the full server version, not static demo
+1. **🍎 iOS Users - READ THIS FIRST**: On iOS, you MUST install this app to your home screen BEFORE notifications will work. In Safari, tap Share (📤) → "Add to Home Screen", then open the installed app and try again.
+2. **Check Permission**: Look for notification permission prompt in browser
+3. **Browser Support**: Requires Safari 16.4+ on iOS, Chrome 50+ on Android
+4. **HTTPS Required**: Production deployments must use HTTPS
+5. **Try Again**: Clear browser data and refresh the page
+6. **Server Mode**: Ensure you're using the full server version, not static demo
 
 #### Not Receiving Notifications?
-1. **Test First**: Use "Send Test Notification" to verify setup
-2. **Check Settings**: Ensure notifications are enabled in browser/device settings
-3. **Background Apps**: Notifications work even when app is closed
-4. **Re-subscribe**: Try disabling and re-enabling notifications
+1. **🍎 iOS Check**: Ensure you've installed the app to home screen (required for iOS)
+2. **Test First**: Use "Send Test Notification" to verify setup
+3. **Check Settings**: Ensure notifications are enabled in browser/device settings
+4. **Background Apps**: Notifications work even when app is closed
+5. **Re-subscribe**: Try disabling and re-enabling notifications
+
+#### iOS-Specific Notification Issues
+1. **"Failed to subscribe" on iPhone**: Install the app to home screen first - this is mandatory on iOS
+2. **Notifications work in browser but not as PWA**: Clear the PWA data and re-enable notifications in the installed app
+3. **iOS 16.3 or earlier**: Push notifications are not supported, update to iOS 16.4+
+4. **Using Chrome on iOS**: Switch to Safari - only Safari supports PWA installation on iOS
 
 #### Test Notification Failed?
 1. **Console Check**: Open browser developer tools for error messages
@@ -315,7 +335,10 @@ A: No! Once you enable notifications, you'll receive them even when the app or b
 A: The app is designed to send one inspirational quote per day. The exact timing depends on how the server is configured (some deployments may not have automatic daily notifications set up yet).
 
 **Q: Can I get notifications on my iPhone?**  
-A: Yes! iPhone support for web push notifications was added in iOS 16.4. Make sure your iPhone is updated and use Safari browser.
+A: Yes! iPhone support for web push notifications was added in iOS 16.4. **IMPORTANT**: On iOS, you MUST first install the app to your home screen before notifications will work. Use Safari, tap the Share button (📤), select "Add to Home Screen", then open the installed app and enable notifications.
+
+**Q: Why don't notifications work on my iPhone even though I enabled them?**  
+A: This is the most common issue! iOS requires the app to be installed as a PWA (to home screen) before push notifications will function. If you're using the app in Safari browser without installing it, notifications won't work. Install it to your home screen first, then try enabling notifications again.
 
 **Q: What's the difference between the demo and full version?**  
 A: The demo version (GitHub Pages) lets you browse quotes and install as a PWA, but can't send push notifications. The full version (deployed server) includes all features including push notifications.
