@@ -7,7 +7,7 @@ A Progressive Web App (PWA) that delivers inspiring quotes from famous people as
 
 - 📱 **Progressive Web App (PWA)** - Install on your home screen like a native app
 - 🔔 **Push Notifications** - Receive quotes as notifications even when the app is closed
-- ⏰ **Hourly Notifications** - Automatic quotes delivered every hour
+- ⏰ **Daily Notifications** - Automatic quotes delivered every day
 - 🧪 **Test Button** - Manual notification testing
 - 💬 **Famous Quotes** - Curated collection of inspiring quotes from well-known figures
 - 📱 **Mobile Optimized** - Designed specifically for iPhone and iPad
@@ -77,8 +77,8 @@ A Progressive Web App (PWA) that delivers inspiring quotes from famous people as
    - Use the "Send Test Notification" button to verify setup
    - You should receive a notification immediately
 
-3. **Automatic Hourly Quotes**:
-   - Once subscribed, you'll receive a new quote every hour
+3. **Automatic Daily Quotes**:
+   - Once subscribed, you'll receive a new quote every day
    - Notifications work even when the app is closed
    - Perfect for motivation throughout the day!
 

@@ -1,5 +1,5 @@
 // Example: Scheduled notification endpoint for Vercel Cron Jobs
-// This file demonstrates how to add hourly notifications using Vercel Cron Jobs
+// This file demonstrates how to add daily notifications using Vercel Cron Jobs
 // See: https://vercel.com/docs/cron-jobs
 
 import webpush from 'web-push';
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     // For this demo, we'll just log that the cron job ran
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
     const payload = JSON.stringify({
-      title: 'Hourly Quote',
+      title: 'Daily Quote',
       body: `"${randomQuote.text}" - ${randomQuote.author}`,
       icon: '/icon-192x192.png',
       badge: '/badge-72x72.png'
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ 
       success: true, 
-      message: 'Hourly notification cron job completed',
+      message: 'Daily notification cron job completed',
       timestamp: new Date().toISOString(),
       quote: randomQuote
     });
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 //   "crons": [
 //     {
 //       "path": "/api/cron-notify",
-//       "schedule": "0 * * * *"
+//       "schedule": "0 0 * * *"
 //     }
 //   ]
 // }
