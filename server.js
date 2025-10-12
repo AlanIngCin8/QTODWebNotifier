@@ -96,12 +96,12 @@ app.post('/api/send-notification', (req, res) => {
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
-// Schedule hourly notifications
+// Schedule daily notifications
 setInterval(() => {
   if (subscriptions.length > 0) {
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
     const payload = JSON.stringify({
-      title: 'Hourly Quote',
+      title: 'Daily Quote',
       body: `"${randomQuote.text}" - ${randomQuote.author}`,
       icon: '/icon-192x192.png',
       badge: '/badge-72x72.png'
@@ -110,7 +110,7 @@ setInterval(() => {
     subscriptions.forEach(subscription => {
       webpush.sendNotification(subscription, payload)
         .catch(err => {
-          console.error('Error sending hourly notification:', err);
+          console.error('Error sending daily notification:', err);
           // Remove invalid subscriptions
           const index = subscriptions.indexOf(subscription);
           if (index > -1) {
@@ -118,9 +118,9 @@ setInterval(() => {
           }
         });
     });
-    console.log('Sent hourly notifications to', subscriptions.length, 'subscribers');
+    console.log('Sent daily notifications to', subscriptions.length, 'subscribers');
   }
-}, 60 * 60 * 1000); // Every hour
+}, 24 * 60 * 60 * 1000); // Every day
 
 app.listen(port, () => {
   console.log(`QTOD Web Notifier server running at http://localhost:${port}`);
