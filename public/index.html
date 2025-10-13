@@ -489,9 +489,9 @@
         function updateSubscribeButton(subscribed) {
             const btn = document.getElementById('subscribeBtn');
             if (subscribed) {
-                btn.textContent = '✅ Notifications Enabled';
-                btn.style.opacity = '0.7';
-                btn.disabled = true;
+                btn.textContent = 'Disable Notifications';
+                btn.style.opacity = '1';
+                btn.disabled = false;
             } else {
                 btn.textContent = 'Enable Notifications';
                 btn.style.opacity = '1';
