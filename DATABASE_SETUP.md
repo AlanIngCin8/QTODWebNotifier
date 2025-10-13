@@ -34,9 +34,16 @@ Database storage solves these issues by providing persistent, shared storage acr
 
 1. **Access Database Settings**:
    - Click on your newly created KV database
-   - Go to the "Settings" tab
+   - Go to the "Settings" or "Overview" tab
 
-2. **Copy REST API Credentials**:
+2. **Choose Connection Method**:
+
+   **Option A: Redis Connection String (Recommended)**:
+   - Look for "Redis connection string" or "REDIS_URL"
+   - Copy the connection string that looks like: `redis://default:password@host:port`
+   - This is the most common and straightforward method
+
+   **Option B: REST API Credentials (Alternative)**:
    - Find the "REST API" section
    - Copy these two values:
      - `KV_REST_API_URL`: The REST endpoint URL
@@ -53,7 +60,16 @@ Database storage solves these issues by providing persistent, shared storage acr
    - Click "Settings" tab
    - Select "Environment Variables"
 
-2. **Add KV Variables**:
+2. **Add KV Variables** (choose one method):
+
+   **Method A: Using Redis Connection String (Recommended)**:
+   ```
+   Variable Name: REDIS_URL
+   Value: [Your Redis connection string from Vercel KV]
+   Environments: Production, Preview, Development
+   ```
+
+   **Method B: Using REST API Credentials (Alternative)**:
    ```
    Variable Name: KV_REST_API_URL
    Value: [Your KV REST API URL]
@@ -76,6 +92,13 @@ Database storage solves these issues by providing persistent, shared storage acr
    ```
 
 2. **Add Your Credentials** to `.env.local`:
+
+   **If using Redis connection string**:
+   ```env
+   REDIS_URL=redis://default:your_password@your-kv-host:port
+   ```
+
+   **If using REST API credentials**:
    ```env
    KV_REST_API_URL=https://your-kv-store.kv.vercel-storage.com
    KV_REST_API_TOKEN=your_kv_token_here
@@ -104,6 +127,36 @@ The KV database will store subscriptions as a list:
 ## API Usage Examples
 
 Once configured, you can use Vercel KV in your API functions:
+
+### Using Redis Connection String (REDIS_URL):
+
+```javascript
+import { createClient } from 'redis';
+
+// Create Redis client (will auto-detect REDIS_URL from environment)
+const redis = createClient({
+  url: process.env.REDIS_URL
+});
+
+await redis.connect();
+
+// Store a new subscription
+await redis.lPush('subscriptions', JSON.stringify(subscription));
+
+// Get all subscriptions
+const subscriptions = await redis.lRange('subscriptions', 0, -1);
+const parsedSubscriptions = subscriptions.map(sub => JSON.parse(sub));
+
+// Remove invalid subscription
+await redis.lRem('subscriptions', 1, JSON.stringify(invalidSubscription));
+
+// Get subscription count
+const count = await redis.lLen('subscriptions');
+
+await redis.disconnect();
+```
+
+### Using REST API Credentials (Alternative):
 
 ```javascript
 import { kv } from '@vercel/kv';
@@ -141,9 +194,9 @@ const count = await kv.llen('subscriptions');
 
 ### Environment Variables Not Working:
 1. Verify variables are set in correct environment (Production/Preview/Development)
-2. Check for typos in variable names
+2. Check for typos in variable names (case-sensitive)
 3. Redeploy after adding new environment variables
-4. Test with `console.log(process.env.KV_REST_API_URL)` (remove after testing)
+4. Test with `console.log(process.env.REDIS_URL || process.env.KV_REST_API_URL)` (remove after testing)
 
 ### Connection Errors:
 1. Verify your KV database is in the same Vercel account as your project

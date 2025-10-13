@@ -17,7 +17,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "redis": "^4.6.0"
   },
   "devDependencies": {
     "vercel": "^37.0.0"

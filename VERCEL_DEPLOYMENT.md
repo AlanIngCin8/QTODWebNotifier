@@ -277,8 +277,10 @@ In your Vercel dashboard, go to Settings > Environment Variables and add:
 
 - **VAPID_PUBLIC_KEY**: Your VAPID public key
 - **VAPID_PRIVATE_KEY**: Your VAPID private key
-- **KV_REST_API_URL**: Your Vercel KV REST API URL (for database storage)
-- **KV_REST_API_TOKEN**: Your Vercel KV REST API token (for database authentication)
+- **REDIS_URL**: Your Vercel KV Redis connection string (recommended method)
+  OR
+- **KV_REST_API_URL**: Your Vercel KV REST API URL (alternative method)
+- **KV_REST_API_TOKEN**: Your Vercel KV REST API token (alternative method)
 - **CRON_SECRET**: A secure random string for cron job authentication (optional but recommended)
 
 ## Step 4: Test Your Deployment
@@ -333,7 +335,7 @@ To add daily notifications, you can:
    - Uncomment the cron configuration in `vercel.json`
    - Implement database storage for subscriptions in the cron endpoint
    - Add `CRON_SECRET` environment variable for security
-   - Configure Vercel KV environment variables (`KV_REST_API_URL` and `KV_REST_API_TOKEN`)
+   - Configure Vercel KV environment variables (`REDIS_URL` or `KV_REST_API_URL` and `KV_REST_API_TOKEN`)
 
 2. **Use GitHub Actions**:
    Create a GitHub Action that calls your `/api/send-notification` endpoint daily.

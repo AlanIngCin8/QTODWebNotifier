@@ -25,11 +25,21 @@ const vapidKeys = {
 
 // Database configuration for Vercel KV
 const dbConfig = {
-  // KV connection will be automatically configured when @vercel/kv is used
-  // Environment variables needed:
-  // - KV_REST_API_URL: Your Vercel KV REST API endpoint
-  // - KV_REST_API_TOKEN: Your Vercel KV authentication token
-  isConfigured: !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
+  // KV connection can use either Redis URL or REST API credentials
+  // Method 1: Redis connection string (recommended)
+  hasRedisUrl: !!process.env.REDIS_URL,
+  // Method 2: REST API credentials (alternative)
+  hasRestApi: !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN),
+  // Check if either method is configured
+  get isConfigured() {
+    return this.hasRedisUrl || this.hasRestApi;
+  },
+  // Get the preferred connection method
+  get connectionMethod() {
+    if (this.hasRedisUrl) return 'redis';
+    if (this.hasRestApi) return 'rest';
+    return 'none';
+  }
 };
 
 export { quotes, vapidKeys, dbConfig };
