@@ -277,6 +277,9 @@ In your Vercel dashboard, go to Settings > Environment Variables and add:
 
 - **VAPID_PUBLIC_KEY**: Your VAPID public key
 - **VAPID_PRIVATE_KEY**: Your VAPID private key
+- **KV_REST_API_URL**: Your Vercel KV REST API URL (for database storage)
+- **KV_REST_API_TOKEN**: Your Vercel KV REST API token (for database authentication)
+- **CRON_SECRET**: A secure random string for cron job authentication (optional but recommended)
 
 ## Step 4: Test Your Deployment
 
@@ -330,6 +333,7 @@ To add daily notifications, you can:
    - Uncomment the cron configuration in `vercel.json`
    - Implement database storage for subscriptions in the cron endpoint
    - Add `CRON_SECRET` environment variable for security
+   - Configure Vercel KV environment variables (`KV_REST_API_URL` and `KV_REST_API_TOKEN`)
 
 2. **Use GitHub Actions**:
    Create a GitHub Action that calls your `/api/send-notification` endpoint daily.
@@ -341,6 +345,27 @@ To add daily notifications, you can:
 
 For production use, replace the in-memory subscription storage with a database:
 
+### Setting Up Vercel KV (Recommended)
+
+1. **Create KV Database**:
+   - Go to your Vercel dashboard
+   - Navigate to Storage tab
+   - Click "Create Database" > "KV"
+   - Choose a name for your database
+   - Select a region close to your users
+
+2. **Get Connection Details**:
+   - After creation, go to the database settings
+   - Copy the "REST API" credentials:
+     - `KV_REST_API_URL`: The REST endpoint URL
+     - `KV_REST_API_TOKEN`: The authentication token
+
+3. **Add Environment Variables**:
+   - In your Vercel project settings > Environment Variables
+   - Add both `KV_REST_API_URL` and `KV_REST_API_TOKEN`
+   - Apply to all environments (Production, Preview, Development)
+
+4. **Example Implementation**:
 ```javascript
 // Example with Vercel KV
 import { kv } from '@vercel/kv';
@@ -350,7 +375,20 @@ await kv.lpush('subscriptions', JSON.stringify(subscription));
 
 // Get all subscriptions
 const subscriptions = await kv.lrange('subscriptions', 0, -1);
+
+// Remove invalid subscription
+await kv.lrem('subscriptions', 1, JSON.stringify(invalidSubscription));
 ```
+
+### Security Best Practices
+
+⚠️ **Never commit sensitive credentials to your repository**:
+
+- ✅ Use Vercel environment variables for all secrets
+- ✅ Use `.env.local` for local development (already in `.gitignore`)
+- ✅ Rotate credentials regularly
+- ❌ Don't hardcode connection strings in your code
+- ❌ Don't commit `.env` files to Git
 
 ## Troubleshooting
 
@@ -368,3 +406,22 @@ vercel dev
 ```
 
 This will run the serverless functions locally at `http://localhost:3000`.
+
+### Local Environment Setup
+
+1. **Copy environment template**:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. **Add your credentials** to `.env.local`:
+   - VAPID keys for push notifications
+   - Vercel KV credentials for database storage
+   - Optional CRON_SECRET for scheduled notifications
+
+3. **Start development server**:
+   ```bash
+   vercel dev
+   ```
+
+For detailed database setup instructions, see [DATABASE_SETUP.md](DATABASE_SETUP.md).

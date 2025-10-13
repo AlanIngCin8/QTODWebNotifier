@@ -23,4 +23,13 @@ const vapidKeys = {
   privateKey: process.env.VAPID_PRIVATE_KEY || '6C-VIrWqheG5Z3ruv-0QR0JF9c4Lwe7l3edRTpb85JU'
 };
 
-export { quotes, vapidKeys };
+// Database configuration for Vercel KV
+const dbConfig = {
+  // KV connection will be automatically configured when @vercel/kv is used
+  // Environment variables needed:
+  // - KV_REST_API_URL: Your Vercel KV REST API endpoint
+  // - KV_REST_API_TOKEN: Your Vercel KV authentication token
+  isConfigured: !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
+};
+
+export { quotes, vapidKeys, dbConfig };
