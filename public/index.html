@@ -161,6 +161,24 @@
             font-size: 1.1em;
         }
         
+        .subscription-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+        
+        .subscription-info small {
+            display: block;
+            margin-top: 8px;
+            word-break: break-all;
+            opacity: 0.9;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -187,6 +205,11 @@
             🕐 <strong>Daily notifications sent at:</strong><br>
             <span class="time" id="dailyNotificationTime">--:--</span>
             <small id="timezoneInfo">(your local time)</small>
+        </div>
+        
+        <div class="subscription-info" id="subscriptionInfo" style="display: none;">
+            📱 <strong>Device subscription:</strong><br>
+            <small id="subscriptionDetails">Subscription details will appear here</small>
         </div>
         
         <div class="quote-container">
@@ -303,6 +326,9 @@
                     const subscription = await swRegistration.pushManager.getSubscription();
                     isSubscribed = !(subscription === null);
                     updateSubscribeButton(isSubscribed);
+                    if (isSubscribed) {
+                        updateSubscriptionInfo(subscription);
+                    }
                 } catch (error) {
                     console.error('Service Worker registration failed:', error);
                 }
@@ -331,6 +357,7 @@
                         await subscription.unsubscribe();
                         isSubscribed = false;
                         updateSubscribeButton(false);
+                        updateSubscriptionInfo(null);
                         showStatus('Unsubscribed from push notifications', 'success');
                     }
                 } catch (error) {
@@ -362,8 +389,10 @@
                     });
 
                     if (response.ok) {
+                        const result = await response.json();
                         isSubscribed = true;
                         updateSubscribeButton(true);
+                        updateSubscriptionInfo(subscription);
                         showStatus('Successfully subscribed to push notifications!', 'success');
                     } else {
                         throw new Error('Failed to subscribe on server');
@@ -496,6 +525,38 @@
                 btn.textContent = 'Enable Notifications';
                 btn.style.opacity = '1';
                 btn.disabled = false;
+            }
+        }
+
+        function updateSubscriptionInfo(subscription) {
+            const infoDiv = document.getElementById('subscriptionInfo');
+            const detailsDiv = document.getElementById('subscriptionDetails');
+            
+            if (subscription) {
+                // Extract domain from endpoint for display
+                let domain = 'Unknown';
+                try {
+                    const url = new URL(subscription.endpoint);
+                    domain = url.hostname;
+                } catch (e) {
+                    // fallback if URL parsing fails
+                }
+                
+                // Create a short identifier from the endpoint
+                const endpointParts = subscription.endpoint.split('/');
+                const subscriptionId = endpointParts[endpointParts.length - 1] || 'unknown';
+                const shortId = subscriptionId.length > 20 ? 
+                    subscriptionId.substring(0, 10) + '...' + subscriptionId.substring(subscriptionId.length - 10) :
+                    subscriptionId;
+                
+                detailsDiv.innerHTML = `
+                    <strong>Provider:</strong> ${domain}<br>
+                    <strong>Subscription ID:</strong> ${shortId}<br>
+                    <strong>Status:</strong> Active
+                `;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.style.display = 'none';
             }
         }
 
