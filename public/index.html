@@ -146,6 +146,21 @@
             font-size: 0.9em;
         }
         
+        .notification-schedule {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+        
+        .notification-schedule .time {
+            font-weight: bold;
+            color: #ffd700;
+            font-size: 1.1em;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -167,6 +182,12 @@
         <h1>📱 Quote of the Day</h1>
         <p>Get inspired with famous quotes delivered right to your device!</p>
         <p><small><em id="deploymentInfo">🌐 Detecting deployment environment...</em></small></p>
+        
+        <div class="notification-schedule" id="notificationSchedule" style="display: none;">
+            🕐 <strong>Daily notifications sent at:</strong><br>
+            <span class="time" id="dailyNotificationTime">--:--</span>
+            <small id="timezoneInfo">(your local time)</small>
+        </div>
         
         <div class="quote-container">
             <div class="quote-text" id="quoteText">Loading quote...</div>
@@ -198,7 +219,46 @@
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
+            setupNotificationSchedule();
         });
+
+        function setupNotificationSchedule() {
+            // Vercel cron expression: "0 0 * * *" means daily at midnight UTC
+            const utcHour = 0; // midnight UTC
+            const utcMinute = 0;
+            
+            // Create a Date object for today at midnight UTC
+            const now = new Date();
+            const utcMidnight = new Date(Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate(),
+                utcHour,
+                utcMinute
+            ));
+            
+            // Convert to local time
+            const localTime = new Date(utcMidnight.getTime());
+            
+            // Format time in user's locale
+            const timeString = localTime.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            
+            // Get timezone info
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const timezoneOffset = localTime.getTimezoneOffset();
+            const offsetHours = Math.abs(Math.floor(timezoneOffset / 60));
+            const offsetMinutes = Math.abs(timezoneOffset % 60);
+            const offsetSign = timezoneOffset <= 0 ? '+' : '-';
+            const utcOffset = `UTC${offsetSign}${offsetHours.toString().padStart(2, '0')}:${offsetMinutes.toString().padStart(2, '0')}`;
+            
+            // Update the UI
+            document.getElementById('dailyNotificationTime').textContent = timeString;
+            document.getElementById('timezoneInfo').textContent = `(${timezone}, ${utcOffset})`;
+        }
 
         async function initializeApp() {
             // Detect if we're running on a server with API endpoints
@@ -206,6 +266,7 @@
             
             if (hasServerAPI) {
                 document.getElementById('deploymentInfo').innerHTML = '🚀 Full serverless version with push notifications enabled!';
+                document.getElementById('notificationSchedule').style.display = 'block';
                 await registerServiceWorker();
                 await getNewQuoteFromAPI();
             } else {
